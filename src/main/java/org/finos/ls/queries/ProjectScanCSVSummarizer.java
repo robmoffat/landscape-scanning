@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.finos.ls.landscape.ProjectInfo;
 import org.finos.ls.landscape.ProjectInfo.ProjectType;
-import org.finos.ls.queries.BasicQueries.FinosStatus;
+import org.finos.ls.queries.BasicQueries.FinosStage;
 import org.finos.ls.queries.BasicQueries.OpenSSFStatus;
 import org.finos.scan.github.client.Repository;
 import org.finos.scan.github.client.util.QueryExecutor;
@@ -22,26 +22,26 @@ public class ProjectScanCSVSummarizer implements CSVSummarizer{
 	
 	public static final String[] FIELDS = {
 		"Score",
-		"Pass",
 		"Organisation",
 		"Repo Name",
-		"Finos Lifecycle State (from the README badge)",
-		"License (from GitHub Api)",
-		"Issue Activity (for most recent 50 issues, count most recent 30 comments in last 6 months)",
-		"Commit Activity (count of commits in last 6 months, maxed at 100)",
-		"OpenSSF Status (from the README badge)",
-		"Github Archived (has the Archive tag in GitHub API)",
-		"Branch Rules/Private (number of approvers or 0 if no approvers, -1 no branch rules",
-		"SemGrep (checks .github/workflows/semgrep.yml file exists)",
-		"CVE Scanning (checks .github/workflows/cve-scanning.yml file exists)",
-		"Default Branch Name",
-		"Excess Admins",
-		"Main Issue Participants (list of all participants for issues loaded in Issue Activity column)",
-		"Main Committers  (list of all participants for commits loaded in Commit Activity column)",
-		"Length of Readme",
 		"Project Name",
-		"Type",
-		"Stage"
+		"Project Type",
+		"Project Stage",
+		"Stage",
+		"Github Archived",
+		"License",
+		"Meeting Attendance",
+		"Issue/PR Activity",
+		"Commit Activity",
+		"OpenSSF Best Practices",
+		"Branch Protection",
+		"SemGrep",
+		"CVE Scanning",
+		"Default Branch Name",
+		"Admins",
+		"Issue Participants",
+		"Committers",
+		"Readme Length",
 	};
 
 	@Override
@@ -58,31 +58,43 @@ public class ProjectScanCSVSummarizer implements CSVSummarizer{
 
 	@Override
 	public List<Object> convert(Repository r, QueryExecutor qe) {
+
+		// TODO - make sure PRs are included
 		Activity issue = BasicQueries.ISSUE_ACTIVITY.convert(r, qe);
+
+		// TODO - remove 100 items cap
 		Activity commit = BasicQueries.MAIN_RECENT_COMMITTERS.convert(r, qe);
-		FinosStatus finosStatus = BasicQueries.FINOS_STATUS.convert(r, qe);
+
+		// TODO - build query
+		Activity meetingAttendance = null;
+		FinosStage finosStage = BasicQueries.FINOS_STAGE.convert(r, qe);
 		OpenSSFStatus openSSF = BasicQueries.OPENSSF_STATUS.convert(r, qe);
 		String license = BasicQueries.LICENSE_INFO.convert(r, qe);
+
 		Boolean semGrep = BasicQueries.SEMGREP_ACTION.convert(r, qe);
 		Boolean cveScan = BasicQueries.CVE_SCANNING_ACTION.convert(r, qe);
 		String defaultBranchName = BasicQueries.DEFAULT_BRANCH_NAME.convert(r, qe);
 		String wrongAdmins = BasicQueries.WRONG_ADMINS.convert(r, qe);
 		int branchReviewers = BasicQueries.BRANCH_RULES.convert(r, qe);
 		long score = calculateScore(issue, commit, r.getName(), r.getIsPrivate() | r.getIsArchived());
-		String pass = passes(finosStatus, openSSF, wrongAdmins, branchReviewers, license, semGrep, cveScan, score == -1);
+		// TODO - this may be useful for documenting health criteria
+		// String pass = passes(finosStatus, openSSF, wrongAdmins, branchReviewers, license, semGrep, cveScan, score == -1);
 		long readmeLength = BasicQueries.README_LENGTH.convert(r, qe);
 		
 		List<Object> out = new ArrayList<>();
 		out.add(score);
-		out.add(pass);
 		out.add(r.getOwner().getLogin());
 		out.add(r.getName());
-		out.add(finosStatus.name());
+		out.add(projectName(r));
+		out.add(projectType(r));
+		out.add(projectStage(r));
+		out.add(finosStage.name());
+		out.add(r.getIsArchived());
 		out.add(license);
+		out.add(meetingAttendance);
 		out.add(issue.getScore());
 		out.add(commit.getScore());
 		out.add(openSSF.name());
-		out.add(r.getIsArchived());
 		out.add(r.getIsPrivate() ? "PRIVATE" : ""+branchReviewers);
 		out.add(semGrep);
 		out.add(cveScan);
@@ -91,9 +103,6 @@ public class ProjectScanCSVSummarizer implements CSVSummarizer{
 		out.add(convertToSpaceList(issue));
 		out.add(convertToSpaceList(commit));
 		out.add(readmeLength);
-		out.add(projectName(r));
-		out.add(projectType(r));
-		out.add(projectStage(r));
 		return out;
 	}
 
@@ -134,14 +143,14 @@ public class ProjectScanCSVSummarizer implements CSVSummarizer{
 		return null;
 	}
 
-	private String passes(FinosStatus finosStatus, OpenSSFStatus openSSFStatus, String wrongAdmins, int branchReviewers, String license, boolean semGrep, Boolean cveScan, boolean ignore) {
+	private String passes(FinosStage finosStatus, OpenSSFStatus openSSFStatus, String wrongAdmins, int branchReviewers, String license, boolean semGrep, Boolean cveScan, boolean ignore) {
 		StringBuilder sb = new StringBuilder();
 		
 		if (ignore) {
 			return "";
 		} 
 		
-		if ((finosStatus == FinosStatus.NONE) || (finosStatus == FinosStatus.NO_README)) {
+		if ((finosStatus == FinosStage.NONE) || (finosStatus == FinosStage.NO_README)) {
 			sb.append(" (Finos Lifecycle)");
 		}
 		

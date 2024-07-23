@@ -5,3 +5,4 @@ application-local.yml
 /bin
 env
 lib
+.project

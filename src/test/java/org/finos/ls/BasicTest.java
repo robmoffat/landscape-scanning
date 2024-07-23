@@ -9,7 +9,7 @@ import org.finos.ls.outputs.CommitService;
 import org.finos.ls.outputs.PullRequestService;
 import org.finos.ls.queries.Activity;
 import org.finos.ls.queries.BasicQueries;
-import org.finos.ls.queries.BasicQueries.FinosStatus;
+import org.finos.ls.queries.BasicQueries.FinosStage;
 import org.finos.ls.queries.BasicQueries.OpenSSFStatus;
 import org.finos.ls.queries.MarkdownSummarizer;
 import org.finos.ls.queries.MarkdownSummarizer.SummaryLevel;
@@ -83,20 +83,20 @@ public class BasicTest {
 	
 	@Test
 	public void testListOfReposWithStatusInfo() throws GraphQLRequestExecutionException, GraphQLRequestPreparationException {
-		FinosStatus status = qs.getSingleRepository(BasicQueries.FINOS_STATUS, ORG, "FDC3");
-		Assertions.assertEquals(FinosStatus.ACTIVE, status);
+		FinosStage status = qs.getSingleRepository(BasicQueries.FINOS_STAGE, ORG, "FDC3");
+		Assertions.assertEquals(FinosStage.ACTIVE, status);
 		
-		status = qs.getSingleRepository(BasicQueries.FINOS_STATUS, ORG, "spring-bot");
-		Assertions.assertEquals(FinosStatus.INCUBATING, status);
+		status = qs.getSingleRepository(BasicQueries.FINOS_STAGE, ORG, "spring-bot");
+		Assertions.assertEquals(FinosStage.INCUBATING, status);
 		
-		status = qs.getSingleRepository(BasicQueries.FINOS_STATUS, ORG, "datahub");
-		Assertions.assertEquals(FinosStatus.NONE, status);
+		status = qs.getSingleRepository(BasicQueries.FINOS_STAGE, ORG, "datahub");
+		Assertions.assertEquals(FinosStage.NONE, status);
 		
-		Map<String, FinosStatus> statuses = qs.getAllRepositoriesInOrg(BasicQueries.FINOS_STATUS, ORG);
+		Map<String, FinosStage> statuses = qs.getAllRepositoriesInOrg(BasicQueries.FINOS_STAGE, ORG);
 		outputMap(statuses);
 
-		Assertions.assertTrue(countStatus(statuses, FinosStatus.ACTIVE)>5);
-		Assertions.assertTrue(countStatus(statuses, FinosStatus.INCUBATING)>5);
+		Assertions.assertTrue(countStatus(statuses, FinosStage.ACTIVE)>5);
+		Assertions.assertTrue(countStatus(statuses, FinosStage.INCUBATING)>5);
 		
 	
 	}

@@ -58,7 +58,7 @@ The PAT must have the following scopes enabled:
 
 | Column name | description |
 | ----------- | ----------- |
-| Total Score | Issue Activity + Commit Activity |
+| Score | Issue Activity + Commit Activity |
 | Pass | TO BE REMOVED |
 | Organisation | Name of the GitHub organisation |
 | Repo Name | Name of the GitHub repository |
@@ -66,17 +66,17 @@ The PAT must have the following scopes enabled:
 | Project Type | Software Project or Special Interest Group, parsed from https://github.com/finos/finos-landscape/blob/master/landscape.yml |
 | Project Stage | FINOS Lifecycle Stage, parsed from https://github.com/finos/finos-landscape/blob/master/landscape.yml |
 | Stage | Finos Lifecycle Stage, parsed from README.md badges - https://community.finos.org/docs/governance/Software-Projects/project-lifecycle |
+| Github Archived | Check if the GitHub repository is marked as archived, using GitHub API |
 | License | Repo license, pulled from GitHub Api - https://community.finos.org/docs/governance/Software-Projects/license-categories |
 | Meeting attendance | All comments to issues labeled as `meeting` in the last X days |
 | Issue/PR Activity | All issue creations and comments in the last X days (except for those with label `meeting`) |
 | Issue/PR lifespan | Average issue lifespan in the last X days |
 | Commit Activity | Count number of commits in last 6 months, maxed at 100 (TODO - remove the 100 max) |
-| OpenSSF Best Practices Badge | The OpenSSF Best Practices score, parsed from README.md badges - https://www.bestpractices.dev/en |
-| Github Archived | Check if the GitHub repository is marked as archived, using GitHub API |
+| OpenSSF Best Practices | The OpenSSF Best Practices score, parsed from README.md badges - https://www.bestpractices.dev/en |
 | Branch Protection | Check branch rules: returns the number of approvers, 0 if no approvers are set, -1 if the is no branch protection enabled on the main branch |
 | SemGrep | Checks existance of .github/workflows/semgrep.yml file - (TODO - would be better to check GitHub Actions execution) | 
 | CVE Scanning | Checks existance of .github/workflows/cve-scanning.yml file - (TODO - would be better to check GitHub Actions execution) |
-| Main Branch Name | Checks if default branch name is `main` |
+| Default Branch Name | Checks if default branch name is `main` |
 | Admins | List of users that have admin rights on the repository (expected to be 0, since only finos-admin should have Admin rights on FINOS repositories) |
 | Issue Participants | List of all participants for issues loaded in Issue Activity column |
 | Committers | List of all repository committers |

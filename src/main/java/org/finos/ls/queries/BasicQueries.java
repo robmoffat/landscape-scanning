@@ -40,7 +40,7 @@ public class BasicQueries {
 			+ "        }\n"
 			+ "      }";
 
-	public enum FinosStatus { NO_README, INCUBATING, ACTIVE, NONE }
+	public enum FinosStage { NO_README, INCUBATING, ACTIVE, NONE }
 
 	public enum OpenSSFStatus { NO_README, OK, NONE }
 	
@@ -91,20 +91,20 @@ public class BasicQueries {
 			+ "        }", 20, (r, qe) -> wrongAdmins(r));
 	
 	
-	public static QueryType<FinosStatus> FINOS_STATUS = new AbstractQueryType<FinosStatus>(	
+	public static QueryType<FinosStage> FINOS_STAGE = new AbstractQueryType<FinosStage>(	
 			FILE_LIST, 10, (r, qe) -> {
 			
 			String text = getReadme(r, qe);
 			if (text == null) {
-				return FinosStatus.NO_README;
+				return FinosStage.NO_README;
 			} else if (text.contains("https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating") || 
 					text.contains("https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.svg")) {
-				return FinosStatus.INCUBATING;
+				return FinosStage.INCUBATING;
 			} else if (text.contains("https://finosfoundation.atlassian.net/wiki/display/FINOS/Active") ||
 					text.contains("https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-released.svg")) {
-				return FinosStatus.ACTIVE;
+				return FinosStage.ACTIVE;
 			} else {
-				return FinosStatus.NONE;
+				return FinosStage.NONE;
 			}
 		});
 
